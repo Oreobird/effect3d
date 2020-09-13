@@ -7,4 +7,4 @@ Project build:
 	make
 	
 Usage:
-	./effect3d --file input_file --video output_video --detector yolact --effect lr
+	./effect3d --file hand.wmv --video hand3d.mp4 --detector yolact --effect lr --target person

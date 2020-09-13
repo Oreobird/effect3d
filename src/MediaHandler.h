@@ -15,7 +15,7 @@ class MediaHandler
 {
 public:
     MediaHandler(const std::string &detectName, const std::string &effectName);
-    virtual int preProcess(const std::string &inFile) = 0;
+    virtual int preProcess(const std::string &inFile, const std::string &targetName) = 0;
     virtual int doTask() = 0;
     virtual int postProcess(const std::string &outFile) = 0;
 protected:

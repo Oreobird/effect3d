@@ -4,10 +4,11 @@
 class Yolact final : public Detector 
 {
 public:
-    int detect(cv::Mat& image, std::vector<Object>& objects);
+    int detect(cv::Mat& image, std::vector<Object>& objects, const std::string &targetName);
     int draw(cv::Mat& image, const std::vector<Object>& objects);
 
 private:
+    bool isTargetObj(int label, const std::string &targetName);
     float intersection_area(const Object& a, const Object& b);
     void qsort_descent_inplace(std::vector<Object>& objects, int left, int right);
     void qsort_descent_inplace(std::vector<Object>& objects);

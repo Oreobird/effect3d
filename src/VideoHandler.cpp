@@ -4,12 +4,13 @@
 VideoHandler::VideoHandler(const std::string &detectName, const std::string &effectName)
             :MediaHandler(detectName, effectName),
             m_cap(nullptr),
-            m_videoWriter(nullptr)
+            m_videoWriter(nullptr),
+            m_targetName("person")
 {
     m_frames.clear();
 }
 
-int VideoHandler::preProcess(const std::string &videoInFile) 
+int VideoHandler::preProcess(const std::string &videoInFile, const std::string &targetName) 
 {
     m_cap = std::make_shared<cv::VideoCapture>(videoInFile.c_str());
     if (!m_cap || !m_cap->isOpened()) 
@@ -18,6 +19,7 @@ int VideoHandler::preProcess(const std::string &videoInFile)
         return -1;
     }
  
+    m_targetName = targetName;
     return 0;
 }
 
@@ -38,12 +40,12 @@ int VideoHandler::doTask()
         }
 
         frame_num++;
-        std::cout << "total frame " << frame_count << ", progress " << (float)frame_num / frame_count * 100 << "%" << std::endl;
+        std::cout << "total frame " << frame_count << ", current_num " << frame_num << " progress " << (float)frame_num / frame_count * 100 << "%" << std::endl;
         std::vector<Object> objects;
 
-        m_detector->detect(frame, objects);
+        m_detector->detect(frame, objects, m_targetName);
 
-        //detector->draw(frame, objects);
+        //m_detector->draw(frame, objects);
         m_effect->draw(frame, objects);
 
         m_frames.push_back(frame);

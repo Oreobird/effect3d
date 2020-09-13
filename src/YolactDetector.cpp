@@ -90,15 +90,17 @@ void Yolact::nms_sorted_bboxes(const std::vector<Object>& objects, std::vector<i
 }
 
 
-int Yolact::detect(cv::Mat& image, std::vector<Object>& objects) 
+int Yolact::detect(cv::Mat& image, std::vector<Object>& objects, const std::string &targetName) 
 {
     ncnn::Net yolact;
+
+    yolact.opt.use_vulkan_compute = false;
 
     // original model converted from https://github.com/dbolya/yolact
     // yolact_resnet50_54_800000.pth
     // the ncnn model https://github.com/nihui/ncnn-assets/tree/master/models
-    yolact.load_param("../models/yolact.param");
-    yolact.load_model("../models/yolact.bin");
+    yolact.load_param("yolact.param");
+    yolact.load_model("yolact.bin");
 
     const int target_size = 550;
 
@@ -181,7 +183,7 @@ int Yolact::detect(cv::Mat& image, std::vector<Object>& objects)
         }
     }
 
-    const float confidence_thresh = 0.05f;
+    const float confidence_thresh = 0.2f;
     const float nms_threshold = 0.5f;
     const int keep_top_k = 200;
 
@@ -210,7 +212,7 @@ int Yolact::detect(cv::Mat& image, std::vector<Object>& objects)
         }
 
         // ignore background or low score
-        if (label == 0 || score <= confidence_thresh)
+        if (label == 0 || score <= confidence_thresh || !isTargetObj(label, targetName))
             continue;
 
         // CENTER_SIZE
@@ -323,6 +325,27 @@ int Yolact::detect(cv::Mat& image, std::vector<Object>& objects)
     }
 
     return 0;    
+}
+
+bool Yolact::isTargetObj(int label, const std::string &targetName) 
+{
+    const char* class_names[] = {"background",
+                                "person", "bicycle", "car", "motorcycle", "airplane", "bus",
+                                "train", "truck", "boat", "traffic light", "fire hydrant",
+                                "stop sign", "parking meter", "bench", "bird", "cat", "dog",
+                                "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe",
+                                "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
+                                "skis", "snowboard", "sports ball", "kite", "baseball bat",
+                                "baseball glove", "skateboard", "surfboard", "tennis racket",
+                                "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl",
+                                "banana", "apple", "sandwich", "orange", "broccoli", "carrot",
+                                "hot dog", "pizza", "donut", "cake", "chair", "couch",
+                                "potted plant", "bed", "dining table", "toilet", "tv", "laptop",
+                                "mouse", "remote", "keyboard", "cell phone", "microwave", "oven",
+                                "toaster", "sink", "refrigerator", "book", "clock", "vase",
+                                "scissors", "teddy bear", "hair drier", "toothbrush"
+                                };
+    return (class_names[label] == targetName);
 }
 
 int Yolact::draw(cv::Mat& image, const std::vector<Object>& objects) 

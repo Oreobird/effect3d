@@ -17,6 +17,7 @@ int LREffect::draw(cv::Mat& image, const std::vector<Object>& objects)
     {
         const Object& obj = objects[i];
 //            float ratio = obj.rect.area() / (image.rows * image.cols);
+        std::cout << "obj.prob " << obj.prob << std::endl;
 
         if (obj.prob < 0.5 ) 
         {
@@ -80,6 +81,7 @@ int RLEffect::draw(cv::Mat& image, const std::vector<Object>& objects)
     for (size_t i = 0; i < objects.size(); i++)
     {
         const Object& obj = objects[i];
+        std::cout << "obj.prob " << obj.prob << std::endl;
 
         if (obj.prob < 0.5 ) 
         {
@@ -139,7 +141,7 @@ static void draw_inout_line(const std::vector<Object>& objects, int left_x, int 
     {
         const Object& obj = objects[i];
 
-        if (obj.prob < 0.5 ) 
+        if (obj.prob < 0.5) 
         {
             continue;
         }

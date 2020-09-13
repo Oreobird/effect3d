@@ -1,10 +1,11 @@
 #include "ImageHandler.h"
 
 ImageHandler::ImageHandler(const std::string &detectName, const std::string &effectName)
-            :MediaHandler(detectName, effectName)
+            :MediaHandler(detectName, effectName),
+            m_targetName("person")
 {}
 
-int ImageHandler::preProcess(const std::string &inFile) 
+int ImageHandler::preProcess(const std::string &inFile, const std::string &targetName) 
 {
     m_img = cv::imread(inFile.c_str(), 1);
     if (m_img.empty()) 
@@ -13,6 +14,7 @@ int ImageHandler::preProcess(const std::string &inFile)
         return -1;
     }
 
+    m_targetName = targetName;
     return 0;
 }
 
@@ -20,7 +22,7 @@ int ImageHandler::doTask()
 {
     std::vector<Object> objects;
 
-    int ret = m_detector->detect(m_img, objects);
+    int ret = m_detector->detect(m_img, objects, m_targetName);
     if (ret != 0) 
     {
         return -1;

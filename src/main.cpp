@@ -13,10 +13,11 @@
 static void showHelp() 
 {
     std::cout << "effect3d --file input_file\n"
-			  << "        [--video output_video]\n"
-			  << "        [--image output_image]\n"
-			  << "        --detector yolact\n"
-			  << "        --effect lr|rl"
+              << "         --video output_video\n"
+              << "         --image output_image\n"
+              << "         --detector yolact\n"
+              << "         --effect lr|rl\n"
+              << "         --target person"
               << std::endl;
 }
 
@@ -27,6 +28,7 @@ typedef struct _opt
     std::string detector;
     std::string effect;
     std::string image;
+    std::string target;
 } opt_t;
 
 int processCommandLine(int argc, char** argv, opt_t &opt) 
@@ -38,7 +40,8 @@ int processCommandLine(int argc, char** argv, opt_t &opt)
         OPT_OUT_VIDEO,
         OPT_OUT_IMAGE,
         OPT_DETECTOR,
-        OPT_EFFECT
+        OPT_EFFECT,
+        OPT_TARGET
     };
 
     const int noArgument = 0;
@@ -52,6 +55,7 @@ int processCommandLine(int argc, char** argv, opt_t &opt)
             {"image",            requiredArgument, NULL, OPT_OUT_IMAGE},
             {"detector",         requiredArgument, NULL, OPT_DETECTOR},
             {"effect",           requiredArgument, NULL, OPT_EFFECT},
+            {"target",           requiredArgument, NULL, OPT_TARGET},
             {NULL, 0, NULL, 0}
     };
 
@@ -80,6 +84,9 @@ int processCommandLine(int argc, char** argv, opt_t &opt)
             case OPT_EFFECT:
                 opt.effect = optarg;
                 break;
+            case OPT_TARGET:
+                opt.target = optarg;
+                break;
             default:
                 fprintf(stderr, "Invalid argument passed: %s", argv[optind - 1]);
                 showHelp();
@@ -101,24 +108,18 @@ int main(int argc, char** argv)
     {
         return -1;
     }
-
-    auto detectorMgt = DetectorManager::create();
-    auto detector = detectorMgt->createDetector(opt.detector);
-
-    auto effectMgt = EffectManager::create();
-    auto effect = effectMgt->createEffect(opt.effect);
     
     if (!opt.video.empty()) 
     {
         auto videoHandler = std::make_shared<VideoHandler>(opt.detector, opt.effect);
-        videoHandler->preProcess(opt.filePath);
+        videoHandler->preProcess(opt.filePath, opt.target);
         videoHandler->doTask();
         videoHandler->postProcess(opt.video);
     } 
     else if (!opt.image.empty()) 
     {
         auto imgHandler = std::make_shared<ImageHandler>(opt.detector, opt.effect);
-        imgHandler->preProcess(opt.filePath);
+        imgHandler->preProcess(opt.filePath, opt.target);
         imgHandler->doTask();
         imgHandler->postProcess(opt.image);
     }

@@ -8,3 +8,10 @@ Project build:
 	
 Usage:
 	./effect3d --file hand.wmv --video hand3d.mp4 --detector yolact --effect lr --target person
+	
+	
+
+Detailed design doc, please reference to:
+
+![image](https://github.com/Oreobird/effect3d/blob/master/wechat.jpg)
+
